@@ -1,0 +1,137 @@
+var express = require('express');
+var mongoose = require('mongoose');
+var router = express.Router();
+var bodyParser = require('body-parser');
+
+var AirportGroup = mongoose.model('AirportGroup');
+var AirportDetail = mongoose.model('AirportDetail');
+var Flight = mongoose.model('Flight');
+var Booking = mongoose.model('Booking');
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});
+//=============================================================================
+router.get('/api/airportgroups', function (req, res, next) {
+  AirportGroup.find().populate({path: 'airports'}).exec(function (err, result) {
+    if(err){return next(err);}
+    res.json(result);
+  });
+});
+
+router.post('/api/airportgroups', function (req, res, next) {
+  var group = new AirportGroup(req.body);
+
+  group.save(function (err, group) {
+    if(err){return next(err);}
+    res.json(group);
+  })
+});
+
+router.param('group', function (req, res, next, id) {
+  var query = AirportGroup.findById(id);
+
+  query.exec(function (err, group) {
+    if(err){return next(err);}
+    if(!group){ return next(new Error("Cant find group"))}
+    req.group = group;
+    return next();
+  })
+});
+
+router.delete('/api/airportgroups/:group', function (req, res, next) {
+    req.group.remove(function (err) {
+        if(err) {return next(err);}
+        res.json('done');
+    })
+});
+
+router.get('/api/airportgroups/:group', function (req, res, next) {
+  req.group.populate('airports', function (err, group) {
+    if(err){ return next(err);}
+    res.json(req.group);
+  })
+});
+
+router.post('/api/airportgroups/:group/airports', function (req, res, next) {
+  var airport = new AirportDetail(req.body);
+  airport.group = req.group;
+
+  airport.save(function (err, airport) {
+    if(err){return next(err);}
+    req.group.airports.push(airport);
+    req.group.save(function (err, group) {
+      if(err){return next(err);}
+      res.json(airport);
+    })
+  })
+});
+//====================================================================================
+router.get('/api/flights', function (req, res, next) {
+  Flight.find(function (err, flights) {
+    if(err){return next(err);}
+    res.json(flights);
+  })
+});
+
+router.post('/api/flights', function (req, res, next) {
+  var flight = new Flight(req.body);
+
+  flight.save(function (err, flight) {
+    if(err) {return next(err);}
+    res.json(flight);
+  })
+});
+
+
+// API
+//--------- Get list airports--------------------------------------
+router.get('/api/start-airports', function (req, res, next) {
+  AirportGroup.find().populate('airports').exec(function (err, result) {
+    if(err){return next(err);}
+    res.json(result);
+  });
+});
+
+//---------- Get destination --------------------------------------
+router.get('/api/end-airports', function (req, res, next) {
+  Flight.find({startPos: req.query.startPos}, {endPos: 1}, function (err, airports) {
+    var arr = [];
+    for (var x in airports){
+      arr.push(airports[x].endPos);
+    }
+    AirportGroup.find().populate({
+      path: 'airports',
+      match: {id: {$in : arr}}
+    }).exec(function (err, endAirports) {
+      res.json(endAirports);
+    })
+  })
+});
+
+//------------- Search For Flight ------------------------------------
+
+router.get('/api/flightss',  function (req, res, next) {
+  var start = req.query.start;
+  var end = req.query.end;
+  var day = new Date(req.query.day);
+  var seat = req.query.seat;
+  var price = req.query.price;
+  Flight.find({
+    startPos: start,
+    endPos: end,
+    day: {$gte: req.query.day, $lt: day.setDate(day.getDate()+1)},
+    seatClass: seat,
+    priceClass: price
+  }, function (err, flights) {
+    res.json(flights);
+  })
+});
+
+//-------------- Create Booking -------------------------------------------
+router.post('/api/bookings', function (req, res, next) {
+
+});
+
+module.exports = router;
