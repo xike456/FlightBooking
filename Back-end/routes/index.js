@@ -7,6 +7,8 @@ var AirportGroup = mongoose.model('AirportGroup');
 var AirportDetail = mongoose.model('AirportDetail');
 var Flight = mongoose.model('Flight');
 var Booking = mongoose.model('Booking');
+var FlightDetail = mongoose.model('FlightDetail');
+var Passenger = mongoose.model('Passenger');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -131,7 +133,42 @@ router.get('/api/flightss',  function (req, res, next) {
 
 //-------------- Create Booking -------------------------------------------
 router.post('/api/bookings', function (req, res, next) {
+    var id = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 6).toUpperCase();
+    while(Booking.find({id: id}).length ==0) {
+        id = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 6).toUpperCase();
+    }
+    var booking = new Booking(req.body);
+    booking.id = id;
+    booking.status = 0;
+    booking.price = 0;
+    booking.save(function (err, booking) {
+        if(err){return next(err)}
+        res.json(booking);
+    })
+});
+router.get('/api/bookings', function (req, res, next) {
+    Booking.find(function (err, bookings) {
+        if(err){return next(err)}
+        res.json(bookings);
+    })
+});
 
+router.param('booking', function (req, res, next, id) {
+    var query = Booking.findById(id);
+    query.exec(function (err, booking) {
+        if(err){return next(err)}
+        if(!booking){return next(new Error("cant find booking"))}
+        req.booking = booking;
+        return next();
+    })
+});
+
+router.get('/api/bookings/:booking', function (req, res, next) {
+   res.json(req.booking);
+});
+
+router.post('/api/booking/:booking/flights', function (req, res, next) {
+    //var flight = new FlightDetail(req.body);
 });
 
 module.exports = router;

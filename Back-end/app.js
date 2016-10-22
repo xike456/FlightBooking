@@ -12,6 +12,8 @@ require("./models/AirportDetail");
 require("./models/AirportGroup");
 require("./models/Flight");
 require("./models/Booking");
+require("./models/FlightDetail");
+require("./models/Passenger");
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -23,7 +25,7 @@ var app = express();
 app.use(function (req, res, next) {
 
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://192.168.2.8:3000');
+  res.setHeader('Access-Control-Allow-Origin', '*');
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
