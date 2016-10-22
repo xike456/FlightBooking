@@ -7,7 +7,7 @@ import { GroupAirport } from './group-airport'
 @Injectable()
 export class FlightService {
 
-    private startAirportsUrl = 'http://192.168.2.6:3000/api/start-airports';  // URL to web api
+    private startAirportsUrl = 'http://localhost:3000/api/start-airports';  // URL to web api
 
     constructor(private http: Http) { }
 
@@ -16,7 +16,22 @@ export class FlightService {
     getFromAirports(): Promise<GroupAirport[]> {
         return this.http.get(this.startAirportsUrl)
             .toPromise()
-            .then(response => response.json() as GroupAirport[])
+            .then(function (response) {
+                var res = response.json();
+                var arrayGroupAirport: Array<GroupAirport> = new Array<GroupAirport>();
+                res.forEach(function (group: any) {
+                    var groupAirport: GroupAirport = new GroupAirport;
+                    groupAirport.group = group.group.toString();
+                    group.airports.forEach(function (data: any) {
+                        var airport: Airport = new Airport();
+                        airport.id = data.id;
+                        airport.name = data.name;
+                        groupAirport.airports.push(airport);
+                    });
+                    arrayGroupAirport.push(groupAirport);
+                });
+                return arrayGroupAirport;
+            })
             .catch(this.handleError);
     }
 

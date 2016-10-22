@@ -102,7 +102,7 @@ export class SearchFormComponent implements OnInit {
 
     classTickets: Class[] = [{ id: 'A', name: '123'}, { id: 'A', name: '456'}, { id: 'A', name: '789'}];
 
-    fromAirports: GroupAirport[];
+    fromAirports: Array<GroupAirport> = new Array<GroupAirport>();
 
     
     toAirports: Airport[] = [
@@ -115,24 +115,9 @@ export class SearchFormComponent implements OnInit {
 
     getFromAirport(): void {
         this.flightService.getFromAirports().then(function(data) {
+            debugger;
             this.fromAirports = data;
         });
-        this.fromAirports = [ 
-            {   group: "Viet Nam", 
-                airports: [ 
-                    { id: 'abc', name: 'Sai Gon' },
-                    { id: 'xyz', name: 'Ha Noi' },
-                    { id: 'tel', name: 'Da Nang' } 
-                ] 
-            }, {
-                group: "America", 
-                airports: [ 
-                    { id: 'abc', name: 'Amarica E' },
-                    { id: 'xyz', name: 'Los Angles' },
-                    { id: 'tel', name: 'Texas' } 
-                ]
-            }
-         ]
     }
 
     ngOnInit(): void {

@@ -1,6 +1,11 @@
 import { Airport } from './Airport'
 
 export class GroupAirport {
-    group: string;
-    airports: Airport[];
+    public group: string;
+    public airports: Array<Airport>;
+
+    constructor() {
+        this.group = "";
+        this.airports = new Array<Airport>();
+    }
 }
