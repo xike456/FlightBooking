@@ -164,11 +164,55 @@ router.param('booking', function (req, res, next, id) {
 });
 
 router.get('/api/bookings/:booking', function (req, res, next) {
-   res.json(req.booking);
+    req.booking.populate(['flightDetails', 'passengers'], function (err, result) {
+        if(err){return next(err)}
+        res.json(result);
+    })
 });
 
-router.post('/api/booking/:booking/flights', function (req, res, next) {
-    //var flight = new FlightDetail(req.body);
+router.post('/api/bookings/:booking/flights', function (req, res, next) {
+    var flight = new FlightDetail(req.body);
+    flight.booking = req.booking;
+    flight.save(function (err, flight) {
+        if(err){return next(err)}
+        req.booking.flightDetails.push(flight);
+        req.booking.save(function (err, booking) {
+            if(err){return next(err)}
+            res.json(booking);
+        })
+    })
 });
 
+router.delete('/api/bookings/:booking', function (req, res, next) {
+    req.booking.remove(function (err, result) {
+        res.json('success');
+    })
+});
+
+router.get('/api/flights-details', function (req, res, next) {
+    FlightDetail.find(function (err, result) {
+        if(err){return next(err)}
+        res.json(result);
+    })
+});
+
+router.post('/api/bookings/:booking/passengers', function (req, res, next) {
+    var passenger = new Passenger(req.body);
+    passenger.booking = req.booking;
+    passenger.save(function (err, passenger) {
+        if(err) {return next(err)}
+        req.booking.passengers.push(passenger);
+        req.booking.save(function (err, booking) {
+            if(err){return next(err)}
+            res.json(booking);
+        })
+    })
+});
+
+router.patch('/api/bookings/:booking', function (req, res, next) {
+    req.booking.update({status: 1}, function (err, booking) {
+        if(err){return next(err)}
+        res.json(booking)
+    })
+});
 module.exports = router;
