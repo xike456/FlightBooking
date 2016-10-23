@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { FlightService } from './flight.service';
+import { Flight } from './flight';
 declare var jQuery:any;
 
 @Component({
@@ -16,83 +18,72 @@ declare var jQuery:any;
               <th data-field="from">From</th>
               <th data-field="to">To</th>
               <th data-field="date">Start date</th>
-              <th data-field="time">Start time</th>
-              <th data-field="class">Class</th>
+              <th data-field="class">Seat Class</th>
+              <th data-field="class">Price Class</th>
               <th data-field="price">Price</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr>
+          <tr *ngFor="let flight of listFlightsForBinding">
             <td><p>
-                <input name="select" type="radio" id="test1" />
-                <label for="test1">BL326</label>
+                <input name="select" type="radio" id="id" value="{{flight.id}}"/>
+                <label for="id">{{flight.id}}</label>
             </p></td>
-            <td>SGN</td>
-            <td>TBB</td>
-            <td>2016-10-05</td>
-            <td>08:45</td>
-            <td>A</td>
-            <td>100000</td>
+            <td>{{flight.startPos}}</td>
+            <td>{{flight.endPos}}</td>
+            <td>{{flight.day}}</td>
+            <td>{{flight.seatClass}}</td>
+            <td>{{flight.priceClass}}</td>
+            <td>{{flight.price}}</td>
             <td><p>
             </p></td>
-          </tr>
-          <tr>
-            <td><p>
-                <input name="select" type="radio" id="test2" />
-                <label for="test2">BL326</label>
-            </p></td>
-            <td>SGN</td>
-            <td>TBB</td>
-            <td>2016-10-05</td>
-            <td>08:45</td>
-            <td>A</td>
-            <td>100000</td>
-          </tr>
-          <tr>
-            <td><p>
-                <input name="select" type="radio" id="test3" />
-                <label for="test3">BL326</label>
-            </p></td>
-            <td>SGN</td>
-            <td>TBB</td>
-            <td>2016-10-05</td>
-            <td>08:45</td>
-            <td>A</td>
-            <td>100000</td>
-          </tr>
-          <tr>
-            <td><p>
-                <input name="select" type="radio" id="test4" />
-                <label for="test4">BL326</label>
-            </p></td>
-            <td>SGN</td>
-            <td>TBB</td>
-            <td>2016-10-05</td>
-            <td>08:45</td>
-            <td>A</td>
-            <td>100000</td>
-          </tr>
-          <tr>
-            <td><p>
-                <input name="select" type="radio" id="test5" />
-                <label for="test5">BL326</label>
-            </p></td>
-            <td>SGN</td>
-            <td>TBB</td>
-            <td>2016-10-05</td>
-            <td>08:45</td>
-            <td>A</td>
-            <td>100000</td>
           </tr>
         </tbody>
       </table>
       <div class="row right-align container">
-        <a class="waves-effect waves-light btn">Booking</a>
+        <a class="waves-effect waves-light btn" (click)="bookingFlight()">Booking</a>
       </div>
     `
 })
-export class SelectComponent {
+export class SelectComponent implements OnInit {
+
+    oneWay: boolean;
+    
+    listFlights: Array<Flight[]>;
+
+    listFlightsForBinding: Flight[];
+
+
+    constructor(private router: Router, private flightService: FlightService) { }
+
+    getFlight(): void {
+        this.flightService.getFlightsOnSelectForm()
+            .then(data => {
+                this.listFlights = data;
+                if (this.listFlights.length > 0) {
+                    this.listFlightsForBinding = this.listFlights[0];
+                    this.oneWay = true;
+                }
+            }).catch(error => { console.log(error) });
+
+        this.flightService.createBooking()
+          .then(data => console.log(data));
+    }
+
+    ngOnInit(): void {
+        this.getFlight();
+
+    }
+
     ngAfterViewInit() { 
+    }
+
+    bookingFlight(): void {
+		var id = jQuery('input[name="select"]:checked').val();
+		var selectItem = this.listFlightsForBinding.find(function(data) {
+			return data.id === id;
+		});
+		this.flightService.addBookingFlight(selectItem);
     }
  }

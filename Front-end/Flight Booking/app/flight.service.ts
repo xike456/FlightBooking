@@ -5,6 +5,7 @@ import 'rxjs/add/operator/toPromise';
 
 import { Airport } from './airport';
 import { GroupAirport } from './group-airport'
+import { Flight } from './flight'
 
 @Injectable()
 export class FlightService {
@@ -47,8 +48,53 @@ export class FlightService {
             .catch(this.handleError);
     }
 
+    listFlights: Promise<Array<Flight[]>>;
+
+    getFlights(fromAirport: string, toAirpot: string, startDate: string, 
+            endDate: string, seat: string, priceClass: string, amount: number): Promise<Array<Flight[]>> {
+        const url = this.baseUrl + 'flights?start=' + fromAirport + '&end=' + toAirpot + '&amount=' + amount
+            + '&dayStart=\'' + startDate + '\'&dayEnd=\'' + endDate + '\'&seat=' + seat + '&price=' + priceClass;
+        console.log(url);
+        this.listFlights = this.http.get(url)
+            .toPromise()
+            .then(response => response.json() as Array<Flight[]>)
+            .catch(this.handleError);
+        return this.listFlights;
+    }
+
+    getFlightsOnSelectForm(): Promise<Array<Flight[]>> {
+        return this.listFlights;
+    };
+
+    booking: Promise<any>;
+    
+    createBooking(): Promise<any> {
+        const url = this.baseUrl + 'bookings' 
+        var body = {
+            day: Date.now()
+        }
+        this.booking = this.http.post(url, body)
+            .toPromise()
+            .then(response => response.json())
+            .catch(this.handleError);
+        return this.booking;
+    }
+
+    addBookingFlight(flight: Flight): Promise<any> {
+        if (this.booking == null)
+            return;
+        this.booking.then(data => {
+            var url = this.baseUrl + 'bookings/' + data._id + '/flights'
+            
+            return this.http.post(url, flight)
+                .toPromise()
+                .then(response => response.json())
+                .catch(this.handleError);
+        }).catch(this.handleError);
+    }
+
     private handleError(error: any): Promise<any> {
         console.error('An error occurred', error); // for demo purposes only
         return Promise.reject(error.message || error);
-  }
+    }
 }
