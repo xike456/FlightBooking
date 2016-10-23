@@ -120,13 +120,15 @@ router.get('/api/flights',  function (req, res, next) {
     var dayStart = new Date(req.query.dayStart);
     var seat = req.query.seat;
     var price = req.query.price;
+    var amount = req.query.amount;
     var list = [];
     Flight.find({
         startPos: start,
         endPos: end,
         day: {$gte: req.query.dayStart, $lt: dayStart.setDate(dayStart.getDate()+1)},
         seatClass: seat,
-        priceClass: price
+        priceClass: price,
+        amount: {$gt: amount}
         }, function (err, flights) {
             console.log('start: ' + flights);
             list.push(flights);
@@ -137,7 +139,8 @@ router.get('/api/flights',  function (req, res, next) {
                     endPos: start,
                     day: {$gte: req.query.dayStart, $lt: dayEnd.setDate(dayEnd.getDate()+1)},
                     seatClass: seat,
-                    priceClass: price
+                    priceClass: price,
+                    amount: {$gt: amount}
                 }, function (err, flights) {
                     console.log('end; ' + flights);
                     list.push(flights);
@@ -228,7 +231,6 @@ router.post('/api/bookings/:booking/passengers', function (req, res, next) {
 router.patch('/api/bookings/:booking', function (req, res, next) {
     req.booking.update({status: 1}, function (err, booking) {
         if(err){return next(err)}
-        res.json(booking)
     })
 });
 module.exports = router;
