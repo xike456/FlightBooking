@@ -233,4 +233,10 @@ router.patch('/api/bookings/:booking', function (req, res, next) {
         if(err){return next(err)}
     })
 });
+
+router.get('/admin/bookings', function (req, res, next) {
+    Booking.find({id: req.query.id}).populate(['flightDetails', 'passengers']).exec(function (err, result) {
+        res.json(result)
+    })
+});
 module.exports = router;
