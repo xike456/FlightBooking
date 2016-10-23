@@ -13,6 +13,7 @@ import { SearchCardComponent } from './select-card.component';
 import { CustomerInfoComponent } from './customer-info.component';
 import { AddFlightComponent } from './add-flight.component';
 import { CheckTicketComponent } from './check-ticket.component';
+import { ResultComponent } from './result.component';
 
 
 
@@ -58,11 +59,15 @@ import { CheckTicketComponent } from './check-ticket.component';
       {
         path: 'check-ticket',
         component: CheckTicketComponent
+      },
+      {
+        path: 'result/:result',
+        component: ResultComponent
       }
     ])
   ],
   declarations: [ AppComponent, SearchFormComponent, HomeComponent, SelectComponent, SearchCardComponent, CustomerInfoComponent, 
-                  AddFlightComponent, CheckTicketComponent ],
+                  AddFlightComponent, CheckTicketComponent, ResultComponent ],
   providers: [ FlightService ],
   bootstrap: [ AppComponent ]
 })

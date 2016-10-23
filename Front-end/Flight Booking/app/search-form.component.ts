@@ -166,7 +166,7 @@ export class SearchFormComponent implements OnInit {
         var seatClass = jQuery('#seatClass').val();
         var amount = jQuery('#amount').val();
 
-        if (fromAirport == "" || toAirport == "" || startDate == "" || priceClass == "" || seatClass == "")
+        if (fromAirport == "" || toAirport == "" || startDate == "" || priceClass == "" || seatClass == "" || amount == "")
                 return;
         this.flightService.getFlights(fromAirport, toAirport, startDate, endDate, seatClass, priceClass, amount)
             .then(data => {

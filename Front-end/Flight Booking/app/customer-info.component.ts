@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { FlightService } from './flight.service';
 
 declare var jQuery:any;
 
@@ -15,7 +17,7 @@ declare var jQuery:any;
             <div class="col s12">
                 <div class="card info-form">
                     <div class="card-content">
-                    <span class="card-title">Customer 1</span>
+                    <span class="card-title">Passenger {{iPassenger}}</span>
                     <div class="row">
                         <form class="col s12">
                             <div class="row">
@@ -73,12 +75,13 @@ declare var jQuery:any;
 
          <div class="row info-form">
             <div class="file-field input-field right">
-                <a class="waves-effect waves-light btn-large"><i class="material-icons left">done</i>Finish</a>
+                <a class="waves-effect waves-light btn-large" (click)="nextPassenger()"><i class="material-icons left">done</i>Next</a>
             </div>
         </div>
     `
 })
-export class CustomerInfoComponent {
+export class CustomerInfoComponent implements OnInit {
+
     ngAfterViewInit() { 
         jQuery(document).ready(function() {
             jQuery('select').material_select();
@@ -88,4 +91,47 @@ export class CustomerInfoComponent {
             selectYears: 15 // Creates a dropdown of 15 years to control year
         });
     }
+
+    constructor(private router: Router, private flightService: FlightService) { }
+
+    iPassenger: number = 1;
+    
+    nPassenger: number = 1; 
+
+    ngOnInit(): void {
+        this.nPassenger = this.flightService.getNumberPassenger();
+    }
+
+    nextPassenger(): void {
+        var firstName = jQuery('#first_name').val();
+        var lastName = jQuery('#last_name').val();
+        var title = jQuery('#title').val();
+        var address = jQuery('#address').val();
+        var sex = jQuery('#sex').val();
+        var birthday = jQuery('#birthday').val();
+        var phone = jQuery('#phone').val();
+        var email = jQuery('#email').val();
+
+        if (firstName == '' || lastName == '' || title == '' || address == ''
+            || sex == '' || birthday == '' || phone == '' || email == '')
+            return;
+        
+        this.flightService.addPassenger(firstName, lastName, title, address, sex, birthday, phone, email);
+        
+        if (this.iPassenger < this.nPassenger) {
+            this.iPassenger++;
+            firstName = jQuery('#first_name').val('');
+            lastName = jQuery('#last_name').val('');
+            title = jQuery('#title').val('');
+            address = jQuery('#address').val('');
+            sex = jQuery('#sex').val('');
+            birthday = jQuery('#birthday').val('');
+            phone = jQuery('#phone').val('');
+            email = jQuery('#email').val('');
+        } else {
+            this.flightService.updateStatusBooking();
+            this.router.navigate(['result', 1]);
+        }
+    }
+
  }

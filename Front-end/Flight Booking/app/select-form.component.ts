@@ -10,7 +10,7 @@ declare var jQuery:any;
         
     `],
     template: `
-    <h2 class="header center-align">Departure Flight Options</h2>
+    <h2 class="header center-align">{{title}}</h2>
     <table class="container">
         <thead>
           <tr>
@@ -49,6 +49,8 @@ declare var jQuery:any;
 export class SelectComponent implements OnInit {
 
     oneWay: boolean;
+
+	title: string = 'Departure Flight Options';
     
     listFlights: Array<Flight[]>;
 
@@ -84,6 +86,20 @@ export class SelectComponent implements OnInit {
 		var selectItem = this.listFlightsForBinding.find(function(data) {
 			return data.id === id;
 		});
+		if (selectItem === undefined)
+			return;
+		console.log(selectItem);
 		this.flightService.addBookingFlight(selectItem);
+		if (this.oneWay == true) {
+			if (this.listFlights[1] != null) {
+				this.title = "Return Flight Options";
+				this.listFlightsForBinding = this.listFlights[1];
+				this.oneWay = false;
+			} else {
+				this.router.navigate(['customer-info']);
+			}
+		} else {
+			this.router.navigate(['customer-info']);
+		}
     }
  }

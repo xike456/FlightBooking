@@ -50,15 +50,17 @@ export class FlightService {
 
     listFlights: Promise<Array<Flight[]>>;
 
+    nPassenger: number;
+
     getFlights(fromAirport: string, toAirpot: string, startDate: string, 
             endDate: string, seat: string, priceClass: string, amount: number): Promise<Array<Flight[]>> {
         const url = this.baseUrl + 'flights?start=' + fromAirport + '&end=' + toAirpot + '&amount=' + amount
             + '&dayStart=\'' + startDate + '\'&dayEnd=\'' + endDate + '\'&seat=' + seat + '&price=' + priceClass;
-        console.log(url);
         this.listFlights = this.http.get(url)
             .toPromise()
             .then(response => response.json() as Array<Flight[]>)
             .catch(this.handleError);
+        this.nPassenger = amount;
         return this.listFlights;
     }
 
@@ -85,10 +87,56 @@ export class FlightService {
             return;
         this.booking.then(data => {
             var url = this.baseUrl + 'bookings/' + data._id + '/flights'
-            
-            return this.http.post(url, flight)
+            var body = {
+                id: flight.id,
+                day: flight.day,
+                seatClass: flight.seatClass,
+                priceClass: flight.priceClass
+            }
+            return this.http.post(url, body)
                 .toPromise()
-                .then(response => response.json())
+                .then(res => res.json())
+                .catch(this.handleError);
+        }).catch(this.handleError);
+    }
+
+    getNumberPassenger(): number {
+        return this.nPassenger;
+    }
+
+    addPassenger(firstName: string, lastName: string, title: string, address: string, 
+        sex: string, birthday: string, phoneNumber: string, email: string): Promise<any> {
+        
+        if (this.booking == null)
+            return;
+        this.booking.then(data => {
+            var url = this.baseUrl + 'bookings/' + data._id + '/passengers'
+            var body = {
+                firstName: firstName,
+                lastName: lastName,
+                title: title,
+                address: address,
+                sex: sex,
+                birthday: birthday,
+                phoneNumber: phoneNumber,
+                email: email
+            }
+            return this.http.post(url, body)
+                .toPromise()
+                .then(res => res.json())
+                .catch(this.handleError);
+        }).catch(this.handleError);
+    }
+
+    updateStatusBooking(): Promise<any> {
+        if (this.booking == null)
+            return;
+        this.booking.then(data => {
+            var url = this.baseUrl + 'bookings/' + data._id;
+
+            return this.http.patch(url, {})
+                .toPromise()
+                .then(res => res.json())
                 .catch(this.handleError);
         }).catch(this.handleError);
     }
