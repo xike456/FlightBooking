@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Headers, Http } from '@angular/http';
-import 'rxjs/add/operator/toPromise';
+import { Observable } from 'rxjs';
+import { Headers, Http, Response } from '@angular/http';
 import { Airport } from './airport';
 import { GroupAirport } from './group-airport'
 
@@ -13,26 +13,32 @@ export class FlightService {
 
     private headers = new Headers({'Content-Type': 'application/json'});
 
-    getFromAirports(): Promise<GroupAirport[]> {
-        return this.http.get(this.startAirportsUrl)
-            .toPromise()
-            .then(function (response) {
-                var res = response.json();
-                var arrayGroupAirport: Array<GroupAirport> = new Array<GroupAirport>();
-                res.forEach(function (group: any) {
-                    var groupAirport: GroupAirport = new GroupAirport;
-                    groupAirport.group = group.group.toString();
-                    group.airports.forEach(function (data: any) {
-                        var airport: Airport = new Airport();
-                        airport.id = data.id;
-                        airport.name = data.name;
-                        groupAirport.airports.push(airport);
-                    });
-                    arrayGroupAirport.push(groupAirport);
-                });
-                return arrayGroupAirport;
-            })
-            .catch(this.handleError);
+    // getFromAirports(): Promise<GroupAirport[]> {
+    //     return this.http.get(this.startAirportsUrl)
+    //         .toPromise()
+    //         .then(function (response) {
+    //             var res = response.json();
+    //             var arrayGroupAirport: Array<GroupAirport> = new Array<GroupAirport>();
+    //             res.forEach(function (group: any) {
+    //                 var groupAirport: GroupAirport = new GroupAirport;
+    //                 groupAirport.group = group.group.toString();
+    //                 group.airports.forEach(function (data: any) {
+    //                     var airport: Airport = new Airport();
+    //                     airport.id = data.id;
+    //                     airport.name = data.name;
+    //                     groupAirport.airports.push(airport);
+    //                 });
+    //                 arrayGroupAirport.push(groupAirport);
+    //             });
+    //             return arrayGroupAirport;
+    //         })
+    //         .catch(this.handleError);
+    // }
+
+    getFromAirports(): Observable<GroupAirport[]> {
+        return this.http
+            .get(this.startAirportsUrl)
+            .map((r: Response) => r.json() as GroupAirport[]);
     }
 
     private handleError(error: any): Promise<any> {

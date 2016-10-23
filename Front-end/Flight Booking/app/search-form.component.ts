@@ -1,4 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable }        from 'rxjs/Observable';
+import { Subject }           from 'rxjs/Subject';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/catch';
 import { Class } from './class';
 import { Airport } from './airport';
 import { GroupAirport } from './group-airport';
@@ -90,7 +97,7 @@ declare var jQuery:any;
                     </label>
                 </div>
                 <div class="file-field input-field right">
-                    <a class="waves-effect waves-light btn-large"><i class="material-icons left">search</i>Find flights</a>
+                    <a class="waves-effect waves-light btn-large" (click)="findFlights()"><i class="material-icons left">search</i>Find flights</a>
                 </div>
             </div>
         </form>
@@ -102,7 +109,8 @@ export class SearchFormComponent implements OnInit {
 
     classTickets: Class[] = [{ id: 'A', name: '123'}, { id: 'A', name: '456'}, { id: 'A', name: '789'}];
 
-    fromAirports: Array<GroupAirport> = new Array<GroupAirport>();
+    fromAirports: GroupAirport[] = new Array<GroupAirport>();
+    private fromAirportTerms = new Subject<GroupAirport[]>();
 
     
     toAirports: Airport[] = [
@@ -113,15 +121,33 @@ export class SearchFormComponent implements OnInit {
 
     constructor(private flightService: FlightService) { }
 
+    // getFromAirport(): void {
+    //     let listGroup: GroupAirport[];
+    //     this.flightService.getFromAirports().then(data => {
+    //         listGroup = data;
+    //     });
+    //     this.fromAirports = listGroup;
+    // }
+
     getFromAirport(): void {
-        this.flightService.getFromAirports().then(function(data) {
-            debugger;
-            this.fromAirports = data;
-        });
+        this.flightService.getFromAirports()
+            .subscribe(
+                data => this.fromAirports = data,
+                err => { console.log(err);
+                });
     }
+    
 
     ngOnInit(): void {
+        // this.fromAirports = this.fromAirportTerms
+        //     .distinctUntilChanged()
+        //     .switchMap(term => term ? this.flightService.getFromAirports() : Observable.of<GroupAirport[]>([]))
+        //     .catch(error => {
+        //         console.log(error);
+        //         return Observable.of<GroupAirport[]>([]);
+        //     });
         this.getFromAirport();
+        
     }
  
     ngAfterViewInit() {
@@ -134,4 +160,15 @@ export class SearchFormComponent implements OnInit {
             selectYears: 15 // Creates a dropdown of 15 years to control year
         });
    }
- }
+   
+   findFlights(): void {
+       this.fromAirports.push({
+           group:"EU", airports: [ { id: "abc", name: "Chau Au"} ]
+       });
+       this.fromAirports = [{
+           group:"EU", airports: [ { id: "abc", name: "Chau Au"} ]
+       }];
+       console.log(this.fromAirports);
+   }
+
+}
