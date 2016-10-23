@@ -68,9 +68,7 @@ declare var jQuery:any;
                     <select id="seatClass">
                         <option value="" disabled selected>Ticket class?</option>
                         <option value="Y">Y</option>
-                        <option value="B">B</option>
                         <option value="C">C</option>
-                        <option value="D">D</option>
                     </select>
                     <label>Ticket class</label>
                 </div>

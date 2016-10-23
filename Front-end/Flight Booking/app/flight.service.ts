@@ -65,6 +65,9 @@ export class FlightService {
     }
 
     getFlightsOnSelectForm(): Promise<Array<Flight[]>> {
+        if (this.listFlights == null) {
+            this.listFlights = Promise.resolve([]);
+        }
         return this.listFlights;
     };
 
@@ -139,6 +142,35 @@ export class FlightService {
                 .then(res => res.json())
                 .catch(this.handleError);
         }).catch(this.handleError);
+    }
+
+    searchTicket(ticketId: string): Promise<any> {
+        var url = 'http://localhost:3000/admin/bookings?id=' + ticketId;
+        return this.http.get(url)
+            .toPromise()
+            .then(res => res.json())
+            .catch(this.handleError);
+    }
+
+    addFlights(fromAirport: string, toAirpot: string, startDate: string, 
+            id: string, seat: string, priceClass: string, amount: number, price: string): Promise<Array<Flight[]>> {
+        const url = this.baseUrl + 'flights';
+        var body = {
+            id: id,
+            startPos: fromAirport,
+            endPos: toAirpot,
+            day: startDate,
+            seatClass: seat,
+            priceClass: priceClass,
+            price: price,
+            amount: amount
+        }
+        this.listFlights = this.http.post(url, body)
+            .toPromise()
+            .then(response => response.json() as Array<Flight[]>)
+            .catch(this.handleError);
+        this.nPassenger = amount;
+        return this.listFlights;
     }
 
     private handleError(error: any): Promise<any> {

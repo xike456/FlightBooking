@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 
+declare var jQuery:any;
+
 @Component({
     selector: 'my-app',
     styles: [`
@@ -14,7 +16,15 @@ import { Component } from '@angular/core';
             <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a routerLink="home">Home</a></li>
                 <li><a routerLink="search">Find flights</a></li>
-                <li><a routerLink="#">About</a></li>
+                <li><a class="dropdown-button" href="#!" data-activates="dropdown1">Admin
+                        <i class="material-icons right">arrow_drop_down</i>
+                    </a>
+                    <!-- Dropdown Structure -->
+                    <ul id='dropdown1' class='dropdown-content'>
+                        <li><a routerLink="add-flight">Add flight</a></li>
+                        <li><a routerLink="check-ticket">Check ticket</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </nav>
@@ -44,5 +54,16 @@ import { Component } from '@angular/core';
     `
 })
 export class AppComponent {
-    
+    ngAfterViewInit(): void {
+        jQuery('.dropdown-button').dropdown({
+            inDuration: 300,
+            outDuration: 225,
+            constrain_width: false, // Does not change width of dropdown to that of the activator
+            hover: true, // Activate on hover
+            gutter: 0, // Spacing from edge
+            belowOrigin: false, // Displays dropdown below the button
+            alignment: 'left' // Displays dropdown with edge aligned to the left of button
+            }
+        );
+    }
  }
