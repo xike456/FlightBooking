@@ -70,7 +70,7 @@ router.post('/api/airportgroups/:group/airports', function (req, res, next) {
   })
 });
 //====================================================================================
-router.get('/api/flights', function (req, res, next) {
+router.get('/api/raw-flights', function (req, res, next) {
   Flight.find(function (err, flights) {
     if(err){return next(err);}
     res.json(flights);
@@ -114,21 +114,37 @@ router.get('/api/end-airports', function (req, res, next) {
 
 //------------- Search For Flight ------------------------------------
 
-router.get('/api/flightss',  function (req, res, next) {
-  var start = req.query.start;
-  var end = req.query.end;
-  var day = new Date(req.query.day);
-  var seat = req.query.seat;
-  var price = req.query.price;
-  Flight.find({
-    startPos: start,
-    endPos: end,
-    day: {$gte: req.query.day, $lt: day.setDate(day.getDate()+1)},
-    seatClass: seat,
-    priceClass: price
-  }, function (err, flights) {
-    res.json(flights);
-  })
+router.get('/api/flights',  function (req, res, next) {
+    var start = req.query.start;
+    var end = req.query.end;
+    var dayStart = new Date(req.query.dayStart);
+    var seat = req.query.seat;
+    var price = req.query.price;
+    var list = [];
+    Flight.find({
+        startPos: start,
+        endPos: end,
+        day: {$gte: req.query.dayStart, $lt: dayStart.setDate(dayStart.getDate()+1)},
+        seatClass: seat,
+        priceClass: price
+        }, function (err, flights) {
+            console.log('start: ' + flights);
+            list.push(flights);
+            if(req.query.dayEnd){
+                var dayEnd = new Date(req.query.dayEnd);
+                Flight.find({
+                    startPos: end,
+                    endPos: start,
+                    day: {$gte: req.query.dayStart, $lt: dayEnd.setDate(dayEnd.getDate()+1)},
+                    seatClass: seat,
+                    priceClass: price
+                }, function (err, flights) {
+                    console.log('end; ' + flights);
+                    list.push(flights);
+                    res.json(list);
+                })
+            }
+    });
 });
 
 //-------------- Create Booking -------------------------------------------
