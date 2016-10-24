@@ -137,7 +137,7 @@ router.get('/api/flights',  function (req, res, next) {
                 Flight.find({
                     startPos: end,
                     endPos: start,
-                    day: {$gte: req.query.dayStart, $lt: dayEnd.setDate(dayEnd.getDate()+1)},
+                    day: {$gte: req.query.dayEnd, $lt: dayEnd.setDate(dayEnd.getDate()+1)},
                     seatClass: seat,
                     priceClass: price,
                     amount: {$gt: amount}
@@ -229,9 +229,20 @@ router.post('/api/bookings/:booking/passengers', function (req, res, next) {
 });
 
 router.patch('/api/bookings/:booking', function (req, res, next) {
-    req.booking.update({status: 1}, function (err, booking) {
+    var money = 0;
+    req.booking.populate(['flightDetails', 'passengers'], function (err, result) {
         if(err){return next(err)}
-    })
+        result.flightDetails.forEach(function (flight) {
+            money += (flight.price * result.passengers.length);
+            console.log('price: ' + flight.price + ' n: ' + result.passengers.length + ' mongey: ' + money);
+        });
+    });
+    setTimeout(function () {
+        req.booking.update({status: 1, price: money}, function (err, booking) {
+            if(err){return next(err)}
+            res.json(booking);
+        })
+    }, 500)
 });
 
 router.get('/admin/bookings', function (req, res, next) {
