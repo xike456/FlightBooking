@@ -97,6 +97,8 @@ export class SelectComponent implements OnInit {
 			if (this.listFlights[1] != null && this.listFlights[1].length > 0) {
 				this.title = "Return Flight Options";
 				this.listFlightsForBinding = this.listFlights[1];
+                if (this.listFlightsForBinding.length == 0)
+                    this.router.navigate(['customer-info']);
 				this.oneWay = false;
 			} else {
 				this.router.navigate(['customer-info']);
