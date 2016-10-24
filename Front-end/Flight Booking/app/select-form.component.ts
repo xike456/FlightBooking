@@ -65,6 +65,9 @@ export class SelectComponent implements OnInit {
                 this.listFlights = data;
                 if (this.listFlights.length > 0) {
                     this.listFlightsForBinding = this.listFlights[0];
+                    if (this.listFlightsForBinding.length == 0)
+                        this.router.navigate(['result', 0]);
+                    console.log(this.listFlights);
                     this.oneWay = true;
                 }
             }).catch(error => { console.log(error) });
@@ -91,7 +94,7 @@ export class SelectComponent implements OnInit {
 		console.log(selectItem);
 		this.flightService.addBookingFlight(selectItem);
 		if (this.oneWay == true) {
-			if (this.listFlights[1] != null) {
+			if (this.listFlights[1] != null && this.listFlights[1].length > 0) {
 				this.title = "Return Flight Options";
 				this.listFlightsForBinding = this.listFlights[1];
 				this.oneWay = false;

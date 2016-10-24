@@ -83,14 +83,6 @@ declare var jQuery:any;
                 </div>
             </div>
             <div class="row">
-                <div class="switch left">
-                    <label>
-                        One way
-                        <input type="checkbox">
-                        <span class="lever"></span>
-                        Return
-                    </label>
-                </div>
                 <div class="file-field input-field right">
                     <a class="waves-effect waves-light btn-large" (click)="findFlights()"><i class="material-icons left">search</i>Find flights</a>
                 </div>
