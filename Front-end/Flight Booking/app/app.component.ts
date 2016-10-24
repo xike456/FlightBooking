@@ -36,9 +36,6 @@ declare var jQuery:any;
         <div class="row">
             <div class="col l6 s12">
             <h5 class="white-text">Booking Flights</h5>
-            <p class="grey-text text-lighten-4">Lorem Ipsum is simply dummy text of the printing 
-            and typesetting industry. Lorem Ipsum has been the industry's standard dummy text 
-            and scrambled it to make a type specimen book.</p>
             </div>
             <div class="col l4 offset-l2 s12">
             

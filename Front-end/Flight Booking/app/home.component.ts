@@ -25,7 +25,7 @@ declare var jQuery:any;
             <img src="app/img/1.png">
         </div>
         <div class="carousel-item" href="#four!">
-            <img src="app/simg/2.jpg">
+            <img src="app/img/2.jpg">
         </div>
     </div>
     `
