@@ -242,7 +242,7 @@ router.patch('/api/bookings/:booking', function (req, res, next) {
             if(err){return next(err)}
             res.json(booking);
         })
-    }, 500)
+    }, 500);
 });
 
 router.get('/admin/bookings', function (req, res, next) {
