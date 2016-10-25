@@ -112,9 +112,18 @@ export class CustomerInfoComponent implements OnInit {
         var phone = jQuery('#phone').val();
         var email = jQuery('#email').val();
 
-        if (firstName == '' || lastName == '' || title == '' || address == ''
-            || sex == '' || birthday == '' || phone == '' || email == '')
+        var invalid = jQuery('.invalid');
+
+        if (invalid.length > 0) {
+            alert("Please check your information!");
             return;
+        }
+
+        if (firstName == '' || lastName == '' || title == '' || address == ''
+            || sex == '' || birthday == '' || phone == '' || email == '') {
+            alert("Please input your information!");
+            return;
+        }
         
         this.flightService.addPassenger(firstName, lastName, title, address, sex, birthday, phone, email);
         
