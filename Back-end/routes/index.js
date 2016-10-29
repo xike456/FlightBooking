@@ -83,7 +83,7 @@ router.get('/api/raw-flights', function (req, res, next) {
   })
 });
 
-router.post('/api/flights', function (req, res, next) {
+router.post('/admin/flights', function (req, res, next) {
   var flight = new Flight(req.body);
 
   flight.save(function (err, flight) {
