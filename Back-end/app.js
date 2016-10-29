@@ -8,18 +8,24 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/flights');
 
+var config = require('./config');
+
 require("./models/AirportDetail");
 require("./models/AirportGroup");
 require("./models/Flight");
 require("./models/Booking");
 require("./models/FlightDetail");
 require("./models/Passenger");
+require("./models/Admin");
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 
 
 var app = express();
+
+app.set('flightadmin', config.secret);
+
 
 // Add headers
 app.use(function (req, res, next) {
@@ -57,7 +63,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

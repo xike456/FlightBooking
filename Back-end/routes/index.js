@@ -2,6 +2,8 @@ var express = require('express');
 var mongoose = require('mongoose');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var jwt = require('jsonwebtoken');
+
 
 var AirportGroup = mongoose.model('AirportGroup');
 var AirportDetail = mongoose.model('AirportDetail');
@@ -9,6 +11,10 @@ var Flight = mongoose.model('Flight');
 var Booking = mongoose.model('Booking');
 var FlightDetail = mongoose.model('FlightDetail');
 var Passenger = mongoose.model('Passenger');
+var Admin = mongoose.model('Admin');
+
+//============================================================
+//============ Admin Authenticate ============================
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -245,9 +251,88 @@ router.patch('/api/bookings/:booking', function (req, res, next) {
     }, 500);
 });
 
+router.use('/admin', function (req, res, next) {
+    console.log(req.headers);
+    var token = req.headers['x-access-token'];
+
+    if (token) {
+
+        // verifies secret and checks exp
+        jwt.verify(token, 'admintoken', function (err, decoded) {
+            if (err) {
+                return res.json({success: false, message: 'Failed to authenticate token.'});
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
+
+    } else {
+        return res.status(403).send({
+            success: false,
+            message: 'No token provided.'
+        });
+    }
+});
+
+router.get('/create', function (req, res, next) {
+    var admin = new Admin();
+    admin.username = 'sa';
+    admin.password = 'password';
+
+    admin.save(function(err) {
+        if (err) throw err;
+
+        console.log('User saved successfully');
+        res.json({ success: true });
+    });
+});
+
+
 router.get('/admin/bookings', function (req, res, next) {
     Booking.find({id: req.query.id}).populate(['flightDetails', 'passengers']).exec(function (err, result) {
         res.json(result)
     })
 });
+
+router.post('/authenticate', function(req, res) {
+
+    // find the user
+    Admin.findOne({
+        username: req.body.username
+    }, function(err, user) {
+
+        if (err) throw err;
+
+        if (!user) {
+            res.json({ success: false, message: 'Authentication failed. User not found.' });
+        } else if (user) {
+
+            // check if password matches
+            if (user.password != req.body.password) {
+                res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+            } else {
+
+                // if user is found and password is right
+                // create a token
+                var token = jwt.sign(user, 'admintoken', {
+                    expiresIn: 60*5 // expires in 24 hours
+                });
+
+                // return the information including token as JSON
+                res.json({
+                    success: true,
+                    message: 'Enjoy your token!',
+                    token: token
+                });
+            }
+
+        }
+
+    });
+});
+
+
+
 module.exports = router;
