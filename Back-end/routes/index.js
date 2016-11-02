@@ -20,6 +20,31 @@ var Admin = mongoose.model('Admin');
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+
+router.use('/admin', function (req, res, next) {
+    console.log(req.headers);
+    var token = req.headers['x-access-token'];
+
+    if (token) {
+
+        // verifies secret and checks exp
+        jwt.verify(token, 'admintoken', function (err, decoded) {
+            if (err) {
+                return res.json({success: false, message: 'Failed to authenticate token.'});
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
+
+    } else {
+        return res.json({
+            success: false,
+            message: 'No token provided.'
+        });
+    }
+});
 //=============================================================================
 router.get('/api/airportgroups', function (req, res, next) {
   AirportGroup.find().populate({path: 'airports'}).exec(function (err, result) {
@@ -251,30 +276,7 @@ router.patch('/api/bookings/:booking', function (req, res, next) {
     }, 500);
 });
 
-router.use('/admin', function (req, res, next) {
-    console.log(req.headers);
-    var token = req.headers['x-access-token'];
 
-    if (token) {
-
-        // verifies secret and checks exp
-        jwt.verify(token, 'admintoken', function (err, decoded) {
-            if (err) {
-                return res.json({success: false, message: 'Failed to authenticate token.'});
-            } else {
-                // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
-                next();
-            }
-        });
-
-    } else {
-        return res.json({
-            success: false,
-            message: 'No token provided.'
-        });
-    }
-});
 
 router.get('/create', function (req, res, next) {
     var admin = new Admin();
