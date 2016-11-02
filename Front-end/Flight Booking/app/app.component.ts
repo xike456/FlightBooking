@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import {LocalStorageService, SessionStorageService} from 'ng2-webstorage';
 
 declare var jQuery:any;
 
@@ -50,7 +51,7 @@ declare var jQuery:any;
     </footer>
     `
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
     ngAfterViewInit(): void {
         jQuery('.dropdown-button').dropdown({
             inDuration: 300,
@@ -62,5 +63,13 @@ export class AppComponent {
             alignment: 'left' // Displays dropdown with edge aligned to the left of button
             }
         );
+    }
+
+    constructor(private storage:LocalStorageService) { }
+
+    isLogin: Boolean;
+
+    ngOnInit(): void {
+        this.isLogin = this.storage.retrieve('isLogin');
     }
  }

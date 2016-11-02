@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }   from '@angular/forms';
 import { RouterModule }   from '@angular/router';
 import { HttpModule }    from '@angular/http';
+import {Ng2Webstorage} from 'ng2-webstorage';
 
 import { FlightService } from './flight.service';
 import { AppComponent }  from './app.component';
@@ -14,6 +15,7 @@ import { CustomerInfoComponent } from './customer-info.component';
 import { AddFlightComponent } from './add-flight.component';
 import { CheckTicketComponent } from './check-ticket.component';
 import { ResultComponent } from './result.component';
+import { LoginComponent } from './login.component';
 
 
 
@@ -22,6 +24,7 @@ import { ResultComponent } from './result.component';
     BrowserModule, 
     FormsModule,
     HttpModule,
+    Ng2Webstorage,
     RouterModule.forRoot([
       {
         path: '',
@@ -63,12 +66,16 @@ import { ResultComponent } from './result.component';
       {
         path: 'result/:result',
         component: ResultComponent
+      },
+      {
+        path: 'login',
+        component: LoginComponent
       }
     ])
   ],
   declarations: [ AppComponent, SearchFormComponent, HomeComponent, SelectComponent, SearchCardComponent, CustomerInfoComponent, 
-                  AddFlightComponent, CheckTicketComponent, ResultComponent ],
-  providers: [ FlightService ],
+                  AddFlightComponent, CheckTicketComponent, ResultComponent, LoginComponent ],
+  providers: [ FlightService],
   bootstrap: [ AppComponent ]
 })
 

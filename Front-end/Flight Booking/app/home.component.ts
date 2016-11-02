@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import {LocalStorageService, SessionStorageService} from 'ng2-webstorage';
 declare var jQuery:any;
 
 @Component({
@@ -30,12 +31,18 @@ declare var jQuery:any;
     </div>
     `
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
     ngAfterViewInit() { 
         jQuery('.carousel.carousel-slider').carousel({full_width: true});
     }
 
-    constructor(private router: Router) { }
+    isLogin: Boolean;
+
+    ngOnInit(): void {
+        this.isLogin = this.storage.retrieve('isLogin');
+    }
+
+    constructor(private router: Router, private storage:LocalStorageService) { }
     
     navigateToSearchPage(): void {
         this.router.navigate([ 'search' ])

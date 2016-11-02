@@ -27,6 +27,7 @@
       // other libraries
       'rxjs':                      'npm:rxjs',
       'angular-in-memory-web-api': 'npm:angular-in-memory-web-api',
+      'ng2-webstorage': 'node_modules/ng2-webstorage'
     },
     // packages tells the System loader how to load when no filename and/or no extension
     packages: {
@@ -40,7 +41,8 @@
       'angular-in-memory-web-api': {
         main: './index.js',
         defaultExtension: 'js'
-      }
+      },
+      'ng2-webstorage': {main: 'bundles/core.umd.js', defaultExtension: 'js'}
     }
   });
 })(this);

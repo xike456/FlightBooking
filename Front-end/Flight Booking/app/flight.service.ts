@@ -7,6 +7,7 @@ import { Airport } from './airport';
 import { GroupAirport } from './group-airport'
 import { Flight } from './flight'
 
+
 @Injectable()
 export class FlightService {
 
@@ -144,17 +145,19 @@ export class FlightService {
         }).catch(this.handleError);
     }
 
-    searchTicket(ticketId: string): Promise<any> {
+    searchTicket(token: string, ticketId: string): Promise<any> {
         var url = 'http://localhost:3000/admin/bookings?id=' + ticketId;
-        return this.http.get(url)
+        var header = new Headers({'Content-Type': 'application/json', 'x-access-token': token });
+        return this.http.get(url, { headers: header})
             .toPromise()
             .then(res => res.json())
             .catch(this.handleError);
     }
 
-    addFlights(fromAirport: string, toAirpot: string, startDate: string, 
-            id: string, seat: string, priceClass: string, amount: number, price: string): Promise<Array<Flight[]>> {
-        const url = this.baseUrl + 'flights';
+    addFlights(token: string, fromAirport: string, toAirpot: string, startDate: string, 
+            id: string, seat: string, priceClass: string, amount: number, price: string): Promise<any> {
+        const url = 'http://localhost:3000/admin/flights';
+        var header = new Headers({'Content-Type': 'application/json', 'x-access-token': token });
         var body = {
             id: id,
             startPos: fromAirport,
@@ -165,16 +168,29 @@ export class FlightService {
             price: price,
             amount: amount
         }
-        this.listFlights = this.http.post(url, body)
+        this.listFlights = this.http.post(url, body, { headers: header})
             .toPromise()
-            .then(response => response.json() as Array<Flight[]>)
+            .then(response => response.json())
             .catch(this.handleError);
         this.nPassenger = amount;
         return this.listFlights;
     }
 
+    login(username: string, password: string) : Promise<any> {
+        var url = 'http://localhost:3000/authenticate';
+        var body = {
+            username: username,
+            password: password
+        }
+        return this.http.post(url, body)
+            .toPromise()
+            .then(res => res.json())
+            .catch(this.handleError);
+    }    
+
     private handleError(error: any): Promise<any> {
         console.error('An error occurred', error); // for demo purposes only
         return Promise.reject(error.message || error);
     }
+
 }

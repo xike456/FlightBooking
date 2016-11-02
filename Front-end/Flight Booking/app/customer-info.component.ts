@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FlightService } from './flight.service';
+import {LocalStorageService, SessionStorageService} from 'ng2-webstorage';
 
 declare var jQuery:any;
 
@@ -92,7 +93,7 @@ export class CustomerInfoComponent implements OnInit {
         });
     }
 
-    constructor(private router: Router, private flightService: FlightService) { }
+    constructor(private router: Router, private flightService: FlightService, private storage:LocalStorageService) { }
 
     iPassenger: number = 1;
     

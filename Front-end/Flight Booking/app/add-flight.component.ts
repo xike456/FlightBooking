@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Class } from './class';
 import { Airport } from './airport';
 import { GroupAirport } from './group-airport';
 import { FlightService } from './flight.service';
+import {LocalStorageService, SessionStorageService} from 'ng2-webstorage';
 
 
 
@@ -96,9 +98,15 @@ export class AddFlightComponent implements OnInit {
     
     toAirports: Airport[];
 
-    constructor(private flightService: FlightService) { }
+    isLogin: Boolean;
+
+    constructor(private router: Router, private flightService: FlightService, private storage:LocalStorageService) {}
 
     ngOnInit(): void {
+        this.isLogin = this.storage.retrieve('isLogin');
+        if (this.isLogin == false) {
+            this.router.navigate(['login']);
+        }
         this.getFromAirport();
     }
 
@@ -138,10 +146,20 @@ export class AddFlightComponent implements OnInit {
         var amount = jQuery('#amount').val();
         var price = jQuery('#price').val();
 
+        var token =  this.storage.retrieve('token');
+
         if (fromAirport == "" || toAirport == "" || startDate == "" || priceClass == "" || seatClass == "" || amount == "" || price == "")
                 return;
-        this.flightService.addFlights(fromAirport, toAirport, startDate, id, seatClass, priceClass, amount, price)
-            .then().catch(error => { console.log(error) });
+        this.flightService.addFlights(token, fromAirport, toAirport, startDate, id, seatClass, priceClass, amount, price)
+            .then(data => {
+                if (data.success == false) {
+                    this.storage.store("isLogin", false);
+                    this.storage.store("token", "");
+                    this.router.navigate(['login']);
+                } else {
+                    alert("Successful");
+                }
+            }).catch(error => { console.log(error) });
 
         fromAirport = jQuery('#sFrom').val('');
         toAirport = jQuery('#sTo').val('');

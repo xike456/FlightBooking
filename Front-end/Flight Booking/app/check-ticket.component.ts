@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FlightService } from './flight.service';
+import {LocalStorageService, SessionStorageService} from 'ng2-webstorage';
+import { Router } from '@angular/router';
 declare var jQuery:any;
 
 @Component({
@@ -69,19 +71,35 @@ declare var jQuery:any;
 })
 export class CheckTicketComponent {
 
-    constructor(private flightService: FlightService) { }
+    constructor(private router: Router, private flightService: FlightService, private storage:LocalStorageService) {}
 
     ngAfterViewInit() { 
+    }
+
+    isLogin: boolean;
+
+    ngOnInit(): void {
+        this.isLogin = this.storage.retrieve('isLogin');
+        if (this.isLogin == false) {
+            this.router.navigate(['login']);
+        }
     }
 
     listTicket: any;
 
     searchTicket(): void {
-        this.flightService.searchTicket(jQuery('#search').val())
+        var token =  this.storage.retrieve('token');
+        this.flightService.searchTicket(token, jQuery('#search').val())
             .then(data => { 
-                if (data.length > 0)
-                this.listTicket = data[0];
-                console.log(this.listTicket);
+                if (data.success == false) {
+                    this.storage.store("isLogin", false);
+                    this.storage.store("token", "");
+                    this.router.navigate(['login']);
+                } else {
+                    if (data.length > 0) {
+                        this.listTicket = data[0];
+                    }
+                }
             })
             .catch(err => console.log(err));
     }
