@@ -104,7 +104,7 @@ export class AddFlightComponent implements OnInit {
 
     ngOnInit(): void {
         this.isLogin = this.storage.retrieve('isLogin');
-        if (this.isLogin == false) {
+        if (this.isLogin == false || this.isLogin == null) {
             this.router.navigate(['login']);
         }
         this.getFromAirport();

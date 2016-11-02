@@ -80,7 +80,7 @@ export class CheckTicketComponent {
 
     ngOnInit(): void {
         this.isLogin = this.storage.retrieve('isLogin');
-        if (this.isLogin == false) {
+        if (this.isLogin == false || this.isLogin == null) {
             this.router.navigate(['login']);
         }
     }
